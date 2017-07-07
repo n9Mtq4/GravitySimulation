@@ -3,6 +3,7 @@ package com.n9mtq4.gravitysim.menu.menus
 import com.n9mtq4.gravitysim.*
 import com.n9mtq4.gravitysim.menu.Menu
 import com.n9mtq4.gravitysim.menu.MenuManager
+import java.awt.Color
 import java.awt.Graphics
 
 /**
@@ -29,11 +30,24 @@ class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 		
 	}
 	
+	override fun pixelDraw(screen: Screen) {
+		
+		
+	}
+	
 	override fun draw(g: Graphics) {
 		
 		super.draw(g)
 		
-		g.drawString("Test", 80, 80)
+		g.color = Color.BLACK
+		
+		bodies.forEach { 
+			val radius = it.radius
+			// the corner value of the circle
+			val cx = it.x - radius
+			val cy = it.y - radius
+			g.fillOval(cx.toInt(), cy.toInt(), radius * 2, radius * 2)
+		}
 		
 	}
 	

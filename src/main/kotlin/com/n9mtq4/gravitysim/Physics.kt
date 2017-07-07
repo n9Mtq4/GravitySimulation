@@ -2,6 +2,7 @@ package com.n9mtq4.gravitysim
 
 import com.n9mtq4.kotlin.extlib.math.minValueOf
 import com.n9mtq4.kotlin.extlib.math.pow
+import com.n9mtq4.kotlin.extlib.pst
 import java.util.*
 
 /**
@@ -10,7 +11,7 @@ import java.util.*
  * @author Will "n9Mtq4" Bresnahan
  */
 //const val BIG_G = 6.674e-11
-const val BIG_G = 1e-4
+const val BIG_G = 1.0
 
 /**
  * Gravity formula
@@ -25,9 +26,9 @@ fun processCycle(threadPool: ThreadPool, bodies: ArrayList<Body>) {
 		
 		threadPool.execute {
 			
-			for (i1 in 0..i - 1) {
+			for (i1 in 0..i - 1) { // TODO: changed to 2 cause of bug should be 1 find the bug
 				
-				if (updateBodies(bodies[i], bodies[i1])) toRemove.add(bodies[i1])
+				pst { if (updateBodies(bodies[i], bodies[i1])) toRemove.add(bodies[i1]) }
 				
 			}
 			
@@ -55,7 +56,7 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 	val distance = b1.distanceTo(b2)
 	
 	// check to see if they collided, join them if they did
-	if (distance < (b1.radius + b2.radius - 2) minValueOf 1) { // 2 is just a pixel offset of a collision
+	if (distance < (b1.radius + b2.radius + 2) minValueOf 2) { // 2 is just a pixel offset of a collision
 		// return true if it should remove b2 from the list at the end of this cycle
 		b1.mass += b2.mass
 		return true
@@ -91,14 +92,14 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 }
 
 
-class Body(var mass: Double = RANDOM.nextDouble() * 1000) {
+class Body(var mass: Double = 1.0) {
 	
-	var x: Double = RANDOM.nextDouble() * 100
-	var y: Double = RANDOM.nextDouble() * 100
+	var x: Double = RANDOM.nextDouble() * 2000
+	var y: Double = RANDOM.nextDouble() * 2000
 	var vx: Double = 0.0
 	var vy: Double = 0.0
 	
 }
 fun Body.distanceTo(other: Body) = Math.sqrt((this.x - other.x).pow(2) + (this.y - other.y).pow(2))
 val Body.radius: Int
-	get() = (Math.log(mass).toInt() / 10) minValueOf 1
+	get() = (Math.log(mass).toInt()) minValueOf 1

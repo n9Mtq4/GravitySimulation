@@ -22,6 +22,7 @@ class MenuManager(val gameClass: GameClass) : KeyListener, MouseListener, MouseM
 	init {
 //		menuStack.push(MainMenu(this))
 		menuStack.push(gameMenu)
+		gameMenu.onPush()
 	}
 	
 	fun pixelDraw(screen: Screen) {
