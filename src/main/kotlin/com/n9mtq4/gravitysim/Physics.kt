@@ -1,8 +1,8 @@
 package com.n9mtq4.gravitysim
 
+import com.n9mtq4.kotlin.extlib.ignore
 import com.n9mtq4.kotlin.extlib.math.minValueOf
 import com.n9mtq4.kotlin.extlib.math.pow
-import com.n9mtq4.kotlin.extlib.pst
 import java.util.*
 
 /**
@@ -11,16 +11,16 @@ import java.util.*
  * @author Will "n9Mtq4" Bresnahan
  */
 //const val BIG_G = 6.674e-11
-const val BIG_G = 1.0
+const val BIG_G = -0.01
 
 /**
  * Gravity formula
  * */
-fun calcForce(m1: Double, m2: Double, r: Double) = BIG_G * m1 * m2 / r / r
+fun calcForce(m1: Double, m2: Double, r: Double) = BIG_G * m1 * m2 / (r * r)
 
-fun processCycle(threadPool: ThreadPool, bodies: ArrayList<Body>) {
+fun processCycle(threadPool: ThreadPool, bodies: MutableList<Body>) {
 	
-	val toRemove = ArrayList<Body>()
+	val toRemove = Collections.synchronizedList(ArrayList<Body>())
 	
 	for (i in 1..bodies.size - 1) {
 		
@@ -28,12 +28,20 @@ fun processCycle(threadPool: ThreadPool, bodies: ArrayList<Body>) {
 			
 			for (i1 in 0..i - 1) { // TODO: changed to 2 cause of bug should be 1 find the bug
 				
-				pst { if (updateBodies(bodies[i], bodies[i1])) toRemove.add(bodies[i1]) }
+				ignore {
+					if (updateBodies(bodies[i], bodies[i1])) {
+						toRemove.add(bodies[i1])
+					}
+				}
 				
 			}
 			
 		}
 		
+	}
+	
+	while (!threadPool.isDone()) {
+		Thread.sleep(1)
 	}
 	
 	bodies.removeAll(toRemove)
@@ -56,9 +64,14 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 	val distance = b1.distanceTo(b2)
 	
 	// check to see if they collided, join them if they did
-	if (distance < (b1.radius + b2.radius + 2) minValueOf 2) { // 2 is just a pixel offset of a collision
+	if (distance < (b1.radius + b2.radius) + 2) { // 2 is just a pixel offset of a collision
 		// return true if it should remove b2 from the list at the end of this cycle
 		b1.mass += b2.mass
+		b1.vx += b2.vx * (b2.mass / b1.mass)
+//		b1.vx /= 2.0
+		b1.vy += b2.vy * (b2.mass / b1.mass)
+//		b1.vy /= 2.0
+//		b2.mass = 0.0
 		return true
 	}
 	
@@ -94,8 +107,8 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 
 class Body(var mass: Double = 1.0) {
 	
-	var x: Double = RANDOM.nextDouble() * 2000
-	var y: Double = RANDOM.nextDouble() * 2000
+	var x: Double = 250 + RANDOM.nextDouble() * 500
+	var y: Double = 250 + RANDOM.nextDouble() * 500
 	var vx: Double = 0.0
 	var vy: Double = 0.0
 	

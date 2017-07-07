@@ -5,6 +5,7 @@ import com.n9mtq4.gravitysim.menu.Menu
 import com.n9mtq4.gravitysim.menu.MenuManager
 import java.awt.Color
 import java.awt.Graphics
+import java.util.*
 
 /**
  * Created by will on 6/6/17 at 8:32 PM.
@@ -14,7 +15,13 @@ import java.awt.Graphics
 class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 	
 	val threadPool = ThreadPool(THREADS)
-	val bodies = ArrayList<Body>()
+	var bodies = Collections.synchronizedList(ArrayList<Body>())
+	
+	var renderBodies = ArrayList<Body>()
+	
+	private val tickSingleThreadPool = ThreadPool(1)
+	
+	var ticking = false
 	
 	override fun onPush() {
 		
@@ -27,6 +34,7 @@ class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 		}
 		
 		threadPool.start()
+		tickSingleThreadPool.start()
 		
 	}
 	
@@ -41,7 +49,7 @@ class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 		
 		g.color = Color.BLACK
 		
-		bodies.forEach { 
+		renderBodies.forEach { 
 			val radius = it.radius
 			// the corner value of the circle
 			val cx = it.x - radius
@@ -53,7 +61,12 @@ class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 	
 	override fun tick() {
 		
-		processCycle(threadPool, bodies)
+		if (ticking) return
+		
+		tickSingleThreadPool.execute { ticking = true; processCycle(threadPool, bodies); ticking = false }
+		
+		renderBodies.clear()
+		bodies.forEach { renderBodies.add(it) }
 		
 	}
 	

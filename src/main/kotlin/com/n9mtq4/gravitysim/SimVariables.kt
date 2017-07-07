@@ -10,7 +10,7 @@ import java.util.*
 
 val RANDOM = Random()
 
-const val THREADS = 8 // TODO: dynamically get this based off current cpu
+const val THREADS = 12 // TODO: dynamically get this based off current cpu
 const val WINDOW_WIDTH = 1000
 const val WINDOW_HEIGHT = 1000
 const val WINDOW_SCALE = 1

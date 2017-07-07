@@ -35,6 +35,13 @@ class ThreadPool(val numThreads: Int) {
 		}
 	}
 	
+	fun isDone(): Boolean {
+		threadList.forEach { 
+			if (it.taskPool.size > 0) return false
+		}
+		return true
+	}
+	
 }
 
 class Worker(id: Int) : Thread("Worker $id") {
@@ -48,7 +55,9 @@ class Worker(id: Int) : Thread("Worker $id") {
 		while (running) {
 			
 			if (taskPool.size > 0) {
-				taskPool.poll()?.invoke()
+//				taskPool.poll()?.invoke()
+				taskPool.first?.invoke()
+				taskPool.remove(taskPool.first)
 			}else {
 				Thread.sleep(1) // sleep if no tasks
 			}

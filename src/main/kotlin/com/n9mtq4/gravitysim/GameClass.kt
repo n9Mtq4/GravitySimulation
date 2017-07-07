@@ -126,6 +126,7 @@ class GameClass : Canvas(), Runnable {
 				ticksInCycle++
 				
 				tick()
+				
 				unprocessedSeconds -= clockSpeed
 				ticked = true
 				tickCount++
