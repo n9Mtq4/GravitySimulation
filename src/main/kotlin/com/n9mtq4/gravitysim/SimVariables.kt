@@ -18,6 +18,6 @@ const val WINDOW_SCALE = 1
 const val DEBUG = true
 const val ANTIALIASING = true
 const val FPS_CAP = true
-const val TICKS_PER_SECOND = 30.0
+const val TICKS_PER_SECOND = 60.0
 
 const val NUM_PARTICLES = 1e4.toInt()

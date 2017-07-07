@@ -55,9 +55,9 @@ class Worker(id: Int) : Thread("Worker $id") {
 		while (running) {
 			
 			if (taskPool.size > 0) {
-//				taskPool.poll()?.invoke()
-				taskPool.first?.invoke()
-				taskPool.remove(taskPool.first)
+				taskPool.poll()?.invoke()
+//				taskPool.first?.invoke()
+//				taskPool.remove(taskPool.first)
 			}else {
 				Thread.sleep(1) // sleep if no tasks
 			}

@@ -33,6 +33,8 @@ class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 			bodies.add(Body())
 		}
 		
+		bodies.add(Body(100.0).apply { x = 500.0; y = 500.0 })
+		
 		threadPool.start()
 		tickSingleThreadPool.start()
 		
@@ -64,6 +66,7 @@ class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 		if (ticking) return
 		
 		tickSingleThreadPool.execute { ticking = true; processCycle(threadPool, bodies); ticking = false }
+//		tickSingleThreadPool.execute { ticking = true; processCycleSingleThread(threadPool, bodies); ticking = false }
 		
 		renderBodies.clear()
 		bodies.forEach { renderBodies.add(it) }

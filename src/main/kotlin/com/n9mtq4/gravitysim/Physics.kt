@@ -11,7 +11,7 @@ import java.util.*
  * @author Will "n9Mtq4" Bresnahan
  */
 //const val BIG_G = 6.674e-11
-const val BIG_G = -0.01
+const val BIG_G = 0.01
 
 /**
  * Gravity formula
@@ -54,6 +54,34 @@ fun processCycle(threadPool: ThreadPool, bodies: MutableList<Body>) {
 	
 }
 
+fun processCycleSingleThread(threadPool: ThreadPool, bodies: MutableList<Body>) {
+	
+	val toRemove = ArrayList<Body>()
+	
+	for (i in 1..bodies.size - 1) {
+		
+		for (i1 in 0..i - 1) { // TODO: changed to 2 cause of bug should be 1 find the bug
+			
+			ignore {
+				if (updateBodies(bodies[i], bodies[i1])) {
+					toRemove.add(bodies[i1])
+				}
+			}
+			
+		}
+		
+	}
+	
+	bodies.removeAll(toRemove)
+	
+	// global tick
+	bodies.forEach {
+		it.x += it.vx
+		it.y += it.vy
+	}
+	
+}
+
 /**
  * Processes the simulation for the two particles
  * returns true if b2 should be removed after running
@@ -63,15 +91,18 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 	// get distance
 	val distance = b1.distanceTo(b2)
 	
+	val xd = b2.x - b1.x
+	val yd = b2.y - b1.y
+	
 	// check to see if they collided, join them if they did
 	if (distance < (b1.radius + b2.radius) + 2) { // 2 is just a pixel offset of a collision
 		// return true if it should remove b2 from the list at the end of this cycle
 		b1.mass += b2.mass
-		b1.vx += b2.vx * (b2.mass / b1.mass)
-//		b1.vx /= 2.0
-		b1.vy += b2.vy * (b2.mass / b1.mass)
-//		b1.vy /= 2.0
-//		b2.mass = 0.0
+		val massRatio = (b2.mass / b1.mass)
+		b1.vx += (b2.vx - b1.vx) * massRatio
+		b1.vy += (b2.vy - b1.vy) * massRatio
+		b1.x += xd * massRatio
+		b1.y += yd * massRatio
 		return true
 	}
 	
@@ -80,8 +111,6 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 	
 	// calculate force vector components
 	// TODO: find way to simplify. May be similar triangles, so just compare ratios?
-	val xd = b2.x - b1.x
-	val yd = b2.y - b1.y
 	
 	val angle = Math.atan2(yd, xd)
 	
@@ -91,8 +120,8 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 	// calculate acceleration
 	val ax1 = fx / b1.mass
 	val ay1 = fy / b1.mass
-	val ax2 = fx / b2.mass
-	val ay2 = fy / b2.mass
+	val ax2 = -fx / b2.mass
+	val ay2 = -fy / b2.mass
 	
 	// update velocities
 	b1.vx += ax1
