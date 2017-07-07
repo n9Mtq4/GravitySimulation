@@ -91,7 +91,7 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 }
 
 
-class Body(var mass: Double) {
+class Body(var mass: Double = RANDOM.nextDouble() * 1000) {
 	
 	var x: Double = RANDOM.nextDouble() * 100
 	var y: Double = RANDOM.nextDouble() * 100
