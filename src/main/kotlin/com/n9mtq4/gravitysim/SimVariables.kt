@@ -10,14 +10,16 @@ import java.util.*
 
 val RANDOM = Random()
 
-const val THREADS = 12 // TODO: dynamically get this based off current cpu
+const val THREADS = 2 // TODO: dynamically get this based off current cpu
 const val WINDOW_WIDTH = 1000
 const val WINDOW_HEIGHT = 1000
 const val WINDOW_SCALE = 1
 
 const val DEBUG = true
+const val PRINT_FPS = false
+const val PRINT_CYCLE_TIMES = false
 const val ANTIALIASING = true
 const val FPS_CAP = true
 const val TICKS_PER_SECOND = 60.0
 
-const val NUM_PARTICLES = 1e4.toInt()
+const val NUM_PARTICLES = 1e3.toInt()

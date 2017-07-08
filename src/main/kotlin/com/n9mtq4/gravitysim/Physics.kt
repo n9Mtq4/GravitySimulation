@@ -22,6 +22,35 @@ fun processCycle(threadPool: ThreadPool, bodies: MutableList<Body>) {
 	
 	val toRemove = Collections.synchronizedList(ArrayList<Body>())
 	
+/*	for (t in 0..threadPool.numThreads - 1) {
+		
+		threadPool.execute { worker ->
+			
+			// kotlin's for loops with steps are too slow
+			var i = 0
+			while (i < bodies.size - 1) {
+				
+//				if (worker.poolId == 0) print("$i,")
+				
+				for (i1 in 0..i - 1) {
+					
+					ignore {
+						if (updateBodies(bodies[i], bodies[i1])) {
+							toRemove.add(bodies[i1])
+						}
+					}
+					
+				}
+				
+				i += threadPool.numThreads
+				
+			}
+			
+//			if (worker.poolId == 0) println("DONE")
+			
+		}
+		
+	}*/
 	for (i in 1..bodies.size - 1) {
 		
 		threadPool.execute {
@@ -134,12 +163,23 @@ fun updateBodies(b1: Body, b2: Body): Boolean {
 }
 
 
-class Body(var mass: Double = 1.0) {
+class Body(var mass: Double = RANDOM.nextDouble() * 20.0) {
 	
-	var x: Double = 250 + RANDOM.nextDouble() * 500
-	var y: Double = 250 + RANDOM.nextDouble() * 500
-	var vx: Double = 0.0
-	var vy: Double = 0.0
+	var x: Double = 50 + RANDOM.nextDouble() * 900
+	var y: Double = 50 + RANDOM.nextDouble() * 900
+	var vx: Double = (RANDOM.nextDouble() - 0.5) * 5.0
+	var vy: Double = (RANDOM.nextDouble() - 0.5) * 5.0
+	
+	init {
+		
+		val dx = x - WINDOW_WIDTH / 2
+		val dy = y - WINDOW_HEIGHT / 2
+		val vAngle = Math.atan2(dy, dx) + Math.PI / 2.0
+		val vMag = RANDOM.nextDouble() * Math.sqrt(Math.sqrt(dx * dx + dy * dy)) * 0.04
+		vx = vMag * Math.cos(vAngle)
+		vy = vMag * Math.sin(vAngle)
+		
+	}
 	
 }
 fun Body.distanceTo(other: Body) = Math.sqrt((this.x - other.x).pow(2) + (this.y - other.y).pow(2))

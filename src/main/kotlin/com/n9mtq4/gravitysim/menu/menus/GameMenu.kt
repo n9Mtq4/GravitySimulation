@@ -33,7 +33,7 @@ class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 			bodies.add(Body())
 		}
 		
-		bodies.add(Body(100.0).apply { x = 500.0; y = 500.0 })
+		bodies.add(Body(1000.0).apply { x = 500.0; y = 500.0; vx = 0.0; vy = 0.0 })
 		
 		threadPool.start()
 		tickSingleThreadPool.start()
@@ -65,7 +65,15 @@ class GameMenu(menuManager: MenuManager) : Menu(menuManager) {
 		
 		if (ticking) return
 		
-		tickSingleThreadPool.execute { ticking = true; processCycle(threadPool, bodies); ticking = false }
+		tickSingleThreadPool.execute {
+			ticking = true
+			val before = System.currentTimeMillis()
+			processCycle(threadPool, bodies)
+//			processCycleSingleThread(threadPool, bodies)
+			val after = System.currentTimeMillis()
+			if (PRINT_CYCLE_TIMES) println((after - before) / 1000.0)
+			ticking = false
+		}
 //		tickSingleThreadPool.execute { ticking = true; processCycleSingleThread(threadPool, bodies); ticking = false }
 		
 		renderBodies.clear()

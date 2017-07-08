@@ -8,7 +8,7 @@ import java.util.*
  * @author Will "n9Mtq4" Bresnahan
  */
 
-typealias Task = () -> Unit
+typealias Task = (Worker) -> Unit
 typealias TaskList = ArrayDeque<Task>
 
 class ThreadPool(val numThreads: Int) {
@@ -44,7 +44,7 @@ class ThreadPool(val numThreads: Int) {
 	
 }
 
-class Worker(id: Int) : Thread("Worker $id") {
+class Worker(val poolId: Int) : Thread("Worker $poolId") {
 	
 	val taskPool: TaskList = TaskList()
 	
@@ -55,7 +55,7 @@ class Worker(id: Int) : Thread("Worker $id") {
 		while (running) {
 			
 			if (taskPool.size > 0) {
-				taskPool.poll()?.invoke()
+				taskPool.poll()?.invoke(this)
 //				taskPool.first?.invoke()
 //				taskPool.remove(taskPool.first)
 			}else {
